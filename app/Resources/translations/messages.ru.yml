@@ -1,0 +1,10 @@
+# messages.ru.yml
+loan: Дать взаймы
+borrow: Взять в кредит
+user: Пользователь
+sum from: Сумма с
+sum to: Сумма по
+proc from: Процент с
+proc to: Процент по
+days from: Дни с
+days to: Дни по

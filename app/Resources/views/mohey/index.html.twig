@@ -1,0 +1,447 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}The Mohey Project{% endblock %}
+{% block body %}
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+        <div class="container topnav">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand topnav" href="#">Back to top</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#about">About</a>
+                    </li>
+                    <li>
+                        <a href="#mobile">Mobile</a>
+                    </li>
+                    <li>
+                        <a href="#contact">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Header -->
+    <a name="main"></a>
+    <div class="intro-header">
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="intro-message">
+
+                            <div class="form-group">
+
+                                <div class="col-sm-3">
+                                    &nbsp;
+                                </div>                                
+                                
+                                <div class="col-sm-3">
+                                    {{ form_start(borrowlist_form, { 'attr': {'class': 'form-horizontal'}} ) }}                                                                    
+                                        {{ form_errors(borrowlist_form) }}
+                                        <div class = "input-group">
+                                            <span class = "input-group-btn">
+                                                <button class="btn btn-default" type="submit">Borrow</button>
+                                            </span>                                              
+                                            {{ form_widget(borrowlist_form.price, { 'attr': {'class': 'form-control', 'placeholder': 50}} ) }}                                            
+                                        </div>    
+                                    {{ form_end(borrowlist_form) }}                                    
+                                    
+<!--                                    
+                                    <form name="registration_form" id="registration_form" class="form-horizontal">
+                                    <div class = "input-group">
+                                        <span class = "input-group-btn">
+                                           <button class="btn btn-default" type="button">Borrow</button>
+                                        </span>
+                                        <input type="text" class="form-control" placeholder="50">
+                                    </div>
+                                    </form>
+-->
+                                </div>
+
+                                <div class="col-sm-3">
+                                    {{ form_start(loan_form, { 'attr': {'class': 'form-horizontal'}} ) }}                                                                    
+                                        {{ form_errors(loan_form) }}
+                                        <div class = "input-group">
+                                            <span class = "input-group-btn">
+                                                <button class="btn btn-default" type="button">Loan</button>
+                                            </span>                                              
+                                            {{ form_widget(loan_form.price, { 'attr': {'class': 'form-control', 'placeholder': 50}} ) }}                                            
+                                        </div>    
+                                    {{ form_end(loan_form) }}                                     
+<!--                                    
+                                    <form name="registration_form1" id="registration_form1" class="form-horizontal">
+                                    <div class = "input-group">
+                                        <input type="text" class="form-control" placeholder="50">
+                                        <span class = "input-group-btn">
+                                           <button class="btn btn-default" type="button">Loan</button>
+                                        </span>
+                                    </div>
+                                    </form>
+-->
+                                </div>
+
+                            </div>
+
+                        <br>
+
+                        {% if app.user and is_granted("ROLE_OAUTH_USER") %}
+                            <p>Logged in as: {{app.user.user.username}}</p>
+                        {% else %}
+                        <hr class="intro-divider">
+                        <ul class="list-inline intro-social-buttons">
+                            <li>
+                                <a href="{{ url("hwi_oauth_service_redirect", {service: "twitter"}) }}" class="btn btn-default btn-lg"><i class="fa fa-twitter fa-fw"></i> <span class="network-name">Twitter</span></a>
+                            </li>
+                            <li>
+                                <a id="facebook_login_button" href="{{ url("hwi_oauth_service_redirect", {service: "facebook"}) }}" class="btn btn-default btn-lg"><i class="fa fa-facebook fa-fw"></i> <span class="network-name">Facebook</span></a>
+                            </li>
+                            <li>
+                                <a href="{{ url("hwi_oauth_service_redirect", {service: "linkedin"}) }}" class="btn btn-default btn-lg"><i class="fa fa-linkedin fa-fw"></i> <span class="network-name">Linkedin</span></a>
+                            </li>
+                        </ul>                            
+                            
+<!--                        <div id="login_page">-->
+
+                            <div id="fb-root"></div>
+                            <script>
+                                window.fbAsyncInit = function() {
+                                    // init the FB JS SDK
+                                    FB.init({
+                                        appId      : '{{ facebook_client_id }}',                    // App ID from the app dashboard
+                                        channelUrl : "{{ absolute_url(asset('channel.php')) }}",    // Channel file for x-domain comms
+                                        status     : true,                                          // Check Facebook Login status
+                                        xfbml      : true                                           // Look for social plugins on the page
+                                    }, {scope: 'email'});
+                                };
+
+                                // Load the SDK asynchronously
+                                (function(d, s, id){
+                                    var js, fjs = d.getElementsByTagName(s)[0];
+                                    if (d.getElementById(id)) {return;}
+                                    js = d.createElement(s); js.id = id;
+                                    js.src = "//connect.facebook.net/en_US/all.js";
+                                    fjs.parentNode.insertBefore(js, fjs);
+                                }(document, 'script', 'facebook-jssdk'));
+
+                                function fb_login() {
+                                    FB.getLoginStatus(function(response) {
+                                        if (response.status === 'connected') {
+                                            // connected
+                                            console.log('Already connected, redirect to login page to create token.');
+                                            document.location = "{{ url("hwi_oauth_service_redirect", {service: "facebook"}) }}";
+                                        } else {
+                                            // not_authorized
+                                            FB.login(function(response) {
+                                                if (response.authResponse) {
+                                                    document.location = "{{ url("hwi_oauth_service_redirect", {service: "facebook"}) }}";
+                                                } else {
+                                                    console.log('Cancelled.');
+                                                }
+                                            }, {scope: 'email'});
+                                        }
+                                    });
+                                }
+
+                                document.getElementById('facebook_login_button').onclick = function(e) {
+                                    e.preventDefault();
+                                    fb_login();
+                                };
+                            </script>
+                        <!--</div>-->
+                        {% endif %}                        
+                        
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.intro-header -->
+
+    <!-- Page Content -->
+
+    <a  name="about"></a>
+    <div class="content-section-a">
+        <div class="container text-center">
+            <div class="row">
+                <h1 class="title-small wow tada animated" style="visibility: visible;">Why Mohey?</h1>
+                <!--<h2 class="subtitle-small wow fadeInLeft animated" data-wow-delay=".5s" style="visibility: visible;-webkit-animation-delay: .5s; -moz-animation-delay: .5s; animation-delay: .5s;">&nbsp</h2>-->
+
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 wow fadeInUp animated" data-wow-delay=".5s" style="visibility: visible;-webkit-animation-delay: .5s; -moz-animation-delay: .5s; animation-delay: .5s;">
+                    <div class="feature-item">
+                        <a href="#about_profit">
+                            <i class="fa fa-dollar fa-4x"></i>
+                            <h3>Profit</h3>
+                        </a>
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+
+
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 wow fadeInUp animated" data-wow-delay=".8s" style="visibility: visible;-webkit-animation-delay: .8s; -moz-animation-delay: .8s; animation-delay: .8s;">
+                    <div class="feature-item">
+                        <a href="#about_fast">
+                            <i class="fa fa-dashboard fa-4x"></i>
+                            <h3>Fast</h3>
+                        </a>
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 wow fadeInUp animated" data-wow-delay="1.2s" style="visibility: visible;-webkit-animation-delay: 1.2s; -moz-animation-delay: 1.2s; animation-delay: 1.2s;">
+                    <div class="feature-item">
+                        <a href="#about_easy">
+                            <i class="fa fa-thumbs-up fa-4x"></i>
+                            <h3>Easy</h3>
+                        </a>
+                        <p>&nbsp;</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <a name="about_profit"></a>
+    <div class="content-section-a">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-5 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Profit for lender<br>Suggest the best offer</h2>
+                    <p class="lead">Get your own profit as you wish. <br>You choose your own rate, amount, currency and how you wish to return an investment.</p>
+                </div>
+                <div class="col-lg-5 col-lg-offset-2 col-sm-6">
+                    <img class="img-responsive" src="bundles/mohey/images/ipad.png" alt="">
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-a -->
+
+    <div class="content-section-b">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Profit for borrower<br>Choose the most profitable offer</h2>
+                    <p class="lead">Nead money?<br> Easy to find amount and rate you wish from the tons of offers.</p>
+                </div>
+                <div class="col-lg-5 col-sm-pull-6  col-sm-6">
+                    <img class="img-responsive" src="bundles/mohey/images/dog.png" alt="">
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-b -->
+
+    <a name="about_fast"></a>
+    <div class="content-section-a">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-5 col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Fast means money</h2>
+                    <p class="lead">We brings a tool for quick decision-making,<br> it doesn't metter who you are: borrower or lender.</p>
+                </div>
+                <div class="col-lg-5 col-lg-offset-2 col-sm-6">
+                    <img class="img-responsive" src="bundles/mohey/images/ipad.png" alt="">
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-a -->
+
+    <a name="about_easy"></a>
+    <div class="content-section-b">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-5 col-lg-offset-1 col-sm-push-6  col-sm-6">
+                    <hr class="section-heading-spacer">
+                    <div class="clearfix"></div>
+                    <h2 class="section-heading">Money - now is the Easiest thing</h2>
+                    <p class="lead">Loan or Borrow in a few steps. Relax and feel the money in your credit card or e-wallet.</p>
+                </div>
+                <div class="col-lg-5 col-sm-pull-6  col-sm-6">
+                    <img class="img-responsive" src="bundles/mohey/images/dog.png" alt="">
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-b -->
+
+    <a name="mobile"></a>
+    <div class="content-section-a" id="features">
+
+        <div class="container">
+            <div class="row">
+                <h1 class="title-small wow tada animated" style="visibility: visible;">Join to be mobile</h1>
+                <div class="col-md-12 text-center">
+                    <a class="btn btn-border btn-lg wow fadeInLeft animated animated" data-wow-offset="10" href="#" style="visibility: visible;"><i class="fa fa-android"></i> Android</a>
+                    <a class="btn btn-border btn-lg wow fadeInRight animated animated" data-wow-offset="10" href="#" style="visibility: visible;"><i class="fa fa-apple"></i>iPhone</a>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="content-left text-right wow fadeInLeft animated animated" data-wow-offset="10" style="visibility: visible;">
+                        <div class="box-item left">
+              <span class="icon">
+                <i class="fa fa-heart-o"></i>
+              </span>
+                            <div class="text">
+                                <h4>24h Online</h4>
+                                <p>Your funds accessible online 24h a day. Enjoy the borrow and loan profit.</p>
+                            </div>
+                        </div>
+                        <div class="box-item left">
+              <span class="icon">
+                <i class="fa fa-file-text-o"></i>
+              </span>
+                            <div class="text">
+                                <h4>Fully Responsive</h4>
+                                <p>On a mobile, tablet or desktop you will see how the layout changes to make the best of the available screen size.</p>
+                            </div>
+                        </div>
+                        <div class="box-item left">
+              <span class="icon">
+                <i class="fa fa-folder-open"></i>
+              </span>
+                            <div class="text">
+                                <h4>Identical</h4>
+                                <p>All functions accessible without platform restrictions.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="show-box wow fadeInDown animated animated" data-wow-offset="10" style="visibility: visible;">
+                        <img src="bundles/mohey/images/iPhone.png" alt="">
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                    <div class="content-right text-left wow fadeInRight animated animated" data-wow-offset="10" style="visibility: visible;">
+                        <div class="box-item right">
+              <span class="icon">
+                <i class="fa fa-power-off"></i>
+              </span>
+                            <div class="text">
+                                <h4>Modern &amp; pretty</h4>
+                                <p>Our application looks great, usefull and uses the most modern technologies.</p>
+                            </div>
+                        </div>
+                        <div class="box-item right">
+              <span class="icon">
+                <i class="fa fa-check"></i>
+              </span>
+                            <div class="text">
+                                <h4>Simple &amp; Secure</h4>
+                                <p>The most simple and secure access to your account and funds everywhere 24h a day.</p>
+                            </div>
+                        </div>
+                        <div class="box-item right">
+              <span class="icon">
+                <i class="fa fa-lightbulb-o"></i>
+              </span>
+                            <div class="text">
+                                <h4>Effective analitics</h4>
+                                <p>Helps you to make right desision.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.content-section-a -->
+
+	<a name="contact"></a>
+    <div class="banner" id="bottom">
+
+        <div class="container">
+
+            <div class="row">
+                <div class="col-lg-9">
+                  &nbsp;<!--  <h2>Join as on the web:</h2>-->
+                </div>
+                <div class="col-lg-3">
+                        <h3>Find us on</h3>
+                        <a class="social" href="#" target="_blank"><i class="fa fa-facebook fa-2x"></i></a>
+                        <a class="social" href="#" target="_blank"><i class="fa fa-twitter fa-2x"></i></a>
+                        <a class="social" href="#" target="_blank"><i class="fa fa-linkedin fa-2x"></i></a>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container -->
+
+    </div>
+    <!-- /.banner -->
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <ul class="list-inline">
+                        <li>
+                            <a href="#">Home</a>
+                        </li>
+                        <li class="footer-menu-divider">&sdot;</li>
+                        <li>
+                            <a href="#about">About</a>
+                        </li>
+                        <li class="footer-menu-divider">&sdot;</li>
+                        <li>
+                            <a href="#mobile">Mobile</a>
+                        </li>
+                        <li class="footer-menu-divider">&sdot;</li>
+                        <li>
+                            <a href="#contact">Contact</a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted small">Copyright &copy; Mohey 2016. All Rights Reserved</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+{% endblock %}

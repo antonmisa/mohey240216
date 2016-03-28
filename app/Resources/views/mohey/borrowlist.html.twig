@@ -1,0 +1,201 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}The Mohey Project{% endblock %}
+{% block table_stylesheets %}
+    <link href="{{ asset('bundles/mohey/css/jquery.dataTables.min.css') }}" rel="stylesheet" type="text/css">
+    <script src="{{ asset('bundles/mohey/js/jquery.dataTables.min.js') }}"></script>
+    <style type="text/css">
+        td.details-control {            
+            cursor: pointer;
+        }
+    </style>
+    <script type="text/javascript" class="init">
+        $(document).ready(function() {                        
+            $('#example')   
+            .on('xhr.dt', function ( e, settings, json, xhr ) {
+                    var href_col = "{{ path('borrow', { id: "%_%" }) }}";                
+                    for ( var i=0, ien=json.data.length ; i < ien ; i++ ) { 
+                        json.data[i].href_col = "<a class=\"btn btn-default\" href=\"" + href_col.replace(escape("%_%"), json.data[i].DT_RowId) + "\">Borrow</a>";
+                    }
+                    // Note no return - manipulate the data directly in the JSON object.
+                } )            
+            var dataTable = $('#example').dataTable( {
+                     "searching": false,
+                     "info": false,
+                     "lengthChange": false,
+                     "deferRender": true,
+                     "processing": true,
+                     "serverSide": true,
+                     "columns": [
+                         {
+                             "class":          "details-control",
+                             "orderable":      false,
+                             "data":           "href_col",
+                             "defaultContent": ">",
+                             "width":          5          
+                         },                         
+                         { "data": "username" },
+                         { "data": "price_from" },
+                         { "data": "price_to" },
+                         { "data": "proc_from" },
+                         { "data": "proc_to" },
+                         { "data": "date_from" },
+                         { "data": "date_to" }
+                     ],                     
+                     "ajax": {
+                            "url" : "{{ path('requestborrowlist') }}",
+                            "data": function ( d ) {
+                                      d.price = $('#inputPrice').text();
+                                      d.proc = $('#inputProc').text();
+                                      d.date = $('#inputDate').text();
+                                  }                     
+                            }
+                      });                                              
+        } );          
+                    $('#btnSearch').click(function(){
+                dataTable.ajax.reload( null, false );
+            }); 
+    </script>
+{% endblock %}
+{% block body %}
+          
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+        <div class="container topnav">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand topnav" href="{{ path("homepage")}}">Back main page</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>            
+    
+    <div class="intro-header">
+        <br>
+        <div class="container">
+            <div class="row">
+                <form class="form-horizontal">
+                     <div class="control-group">
+                          <div class="controls form-inline">
+                               <label for="inputPrice">I want to borrow</label>
+                               <input type="text" class="input-small form-control" placeholder="" id="inputPrice" value="{{ borrowlist.price }}">
+                               <label for="inputProc">USD, at</label>
+                               <input type="text" class="input-small form-control" placeholder="" id="inputProc">
+                               <label for="inputDate">% per year, for </label>
+                               <input type="text" class="input-small form-control" placeholder="" id="inputDate">
+                               <label for="inputValue">days.</label> 
+                               <button class="btn btn-default" type="button" id="btnSearch">Search</button> 
+                          </div>
+                     </div>
+                </form>
+                
+{#                <div class="col-lg-12">
+                    <div class="form-group">
+                        <div class="col-sm-3">I want to borrow <input type="text" id="price_search" name="price_search" class="form-control" placeholder="50"> USD</div>
+                        
+                        <div class="col-sm-3">
+                            at <input type="text" id="proc_search" name="proc_search" class="form-control"> % per year 
+                        </div>
+                        
+                        <div class="col-sm-3">
+                            for period about <input type="text" id="date_search" name="date_search" class="form-control"> days. <button class="btn btn-default" type="button">Search</button> 
+                        </div>
+                    </div>
+                </div> #}   
+            </div>    
+        </div>
+    </div>    
+    
+    <hr class="intro-divider">
+    
+    <div id="example_wrapper" class="dataTables_wrapper">      
+        <div id="example_processing" class="dataTables_processing" style="display: none;">Processing...</div>                             
+        <table id="example" class="display" cellspacing="0" width="100%" role="grid" aria-describedby="example_info" style="width: 100%;">
+            <thead>
+                <tr role="row">
+                    <th></th>
+                    <th class="sorting_asc" tabindex="0" aria-controls="example" rowspan="1" colspan="1" aria-sort="ascending" aria-label="User: activate to sort column descending" style="width: 96px;">User</th>
+                    <th class="sorting_asc" tabindex="0" aria-controls="example" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Sum from: activate to sort column descending" style="width: 96px;">Sum from</th>
+                    <th class="sorting_asc" tabindex="0" aria-controls="example" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Sum to: activate to sort column descending" style="width: 96px;">Sum to</th>
+                    <th class="sorting_asc" tabindex="0" aria-controls="example" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Proc from: activate to sort column descending" style="width: 96px;">Proc from</th>
+                    <th class="sorting_asc" tabindex="0" aria-controls="example" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Proc to: activate to sort column descending" style="width: 96px;">Proc to</th>
+                    <th class="sorting_asc" tabindex="0" aria-controls="example" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Days from: activate to sort column descending" style="width: 96px;">Days from</th>
+                    <th class="sorting_asc" tabindex="0" aria-controls="example" rowspan="1" colspan="1" aria-sort="ascending" aria-label="Days to: activate to sort column descending" style="width: 96px;">Days to</th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr>
+                    <th></th>
+                    <th>User</th>
+                    <th>Sum from</th>
+                    <th>Sum to</th>
+                    <th>Proc from</th>
+                    <th>Proc to</th>
+                    <th>Days from</th>
+                    <th>Days to</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>        
+{#
+    <h1>Current page is {{ thisPage }}</h1>
+
+    <table border="1">
+        <tr>
+            <td>&nbsp</td>
+            <td>user</td>
+            <td>sum from</td>
+            <td>sum to</td>
+            <td>proc from</td>
+            <td>proc to</td>
+            <td>days from</td>
+            <td>days to</td>
+        </tr>
+        {% for offer in offers %}
+            <tr>
+                <td><a href="{{ path('borrow', { id: offer.offer_id }) }}">...</a></td>
+                <td>{{ offer.username }}</td>
+                <td>{{ offer.price_from }}</td>
+                <td>{{ offer.price_to }}</td>
+                <td>{{ offer.proc_from }}</td>
+                <td>{{ offer.proc_to }}</td>
+                <td>{{ offer.date_from }}</td>
+                <td>{{ offer.date_to }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    {{ form_start(borrowlist_form) }}
+    {{ form_errors(borrowlist_form) }}
+
+    {% if maxPages > 1 %}
+        <ul class="pagination pagination-sm">
+            <li {{ thisPage == 1 ? 'class="disabled"' }}>
+                <a href="{{ path('borrowlist', {page: thisPage-1 < 1 ? 1 : thisPage-1}) }}">«</a>
+            </li>
+
+            {% for i in thisPage-2..thisPage+2 %}
+                {% if ((i < thisPage) and (i-1 > 0)) or ((i >= thisPage) and (i-1 < maxPages)) %}
+                    <li {{ thisPage == i ? 'class="active"' }}>
+                        <!--<a href="{{ path('borrowlist', {page: i}) }}">{{ i }}</a>-->
+                        <a href="javascript:;" onclick="parentNode.submit();">{{ i }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            <li {{ thisPage == maxPages ? 'class="disabled"' }}>
+                <a href="{{ path('borrowlist', {page: thisPage+1 <= maxPages ? thisPage+1 : thisPage}) }}">»</a>
+            </li>
+        </ul>
+    {% endif %}
+
+    {{ form_end(borrowlist_form) }}
+#}
+{% endblock %}

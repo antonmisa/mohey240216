@@ -1,0 +1,28 @@
+# This file is auto-generated during the composer install
+parameters:
+    site: http://example.com/
+
+    database_host: 127.0.0.1
+    database_port: null
+    database_name: symfony
+    database_user: root
+    database_password: null
+    mailer_transport: smtp
+    mailer_host: 127.0.0.1
+    mailer_user: null
+    mailer_password: null
+    secret: d0bdfec93a74a58010aefa188f11125a1bb70dcd
+
+    #oauth2
+    facebook_client_id: '169680040073633'
+    facebook_client_secret: 'da78e1ba3be222376ba03608451df90f'
+    google_client_id: 1
+    google_client_secret: 1
+    admins:
+        facebook:
+            - "myfacebook.id"
+
+twig:
+    globals:
+        facebook_client_id: '%facebook_client_id%'
+        site: '%site%'

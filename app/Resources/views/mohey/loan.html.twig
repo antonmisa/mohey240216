@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}The Mohey Project{% endblock %}
+{% block body %}
+
+    {{ form_start(borrow_form) }}
+    {{ form_errors(borrow_form) }}
+
+    {{ form_row(borrow_form.save, { 'label': 'Get' }) }}
+    {{ form_end(borrow_form) }}
+
+{% endblock %}
