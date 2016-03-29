@@ -48,7 +48,7 @@ class BorrowListController extends Controller
         $blf->setPrice($price);
         $blf->setPage($page);
         $repository = $this->getDoctrine()->getRepository('AppBundle:MoheyOffer');
-        $offers = $repository->findAllOffers($blf, $totalItems, $columns, $order, true);                                
+        //$offers = $repository->findAllOffers($blf, $totalItems, $columns, $order, true);                                
         
         return new JsonResponse(array(
             'draw' => $page,
@@ -62,6 +62,9 @@ class BorrowListController extends Controller
      */
     public function showBorrowListAction(Request $request)
     {     
+        $columns = null;
+        $order = null;
+        $repository = $this->getDoctrine()->getRepository('AppBundle:MoheyOffer');        
         $blf = new BorrowListSearchForm();
         
         $lf = new LandingForm();
@@ -69,65 +72,27 @@ class BorrowListController extends Controller
         $borrow_form->handleRequest($request);
         if ($borrow_form->isSubmitted() && $borrow_form->isValid())
         {
+            //after homepage
             $blf->setPrice($lf->getPrice());
+            $borrowlist_form = $this->createForm(BorrowListPostType::class, $blf);
+            $offers = $repository->findAllOffers($blf, $columns, $order);
+        }
+        else
+        {
+            $borrowlist_form = $this->createForm(BorrowListPostType::class, $blf);
+            $borrowlist_form->handleRequest($request);
+            if ($borrowlist_form->isSubmitted() && $borrowlist_form->isValid())
+            {
+                //next page or filter                 
+                $offers = $repository->findAllOffers($blf, $columns, $order); 
+            }
+            else 
+            {
+                //something else, show first page 
+                $offers = $repository->findAllOffers($blf, $columns, $order); 
+            }
         }
         
-        return $this->render('mohey/borrowlist.html.twig', array('borrowlist' => $blf));
-        
-//        $page = 1;
-//        //$pageSize = 10;
-//        $maxPages = 10;
-//
-//        $lf = new LandingForm();
-//        $borrow_form   = $this->createForm(MoheyPostType::class, $lf);
-//
-//        $borrow_form->handleRequest($request);
-//
-//        if ($borrow_form->isSubmitted() && $borrow_form->isValid())
-//        {
-//            //first show after landing page
-//            $price = $lf->getPrice();
-//
-//            //filter enabled offers near $price
-//            $blf = new BorrowListForm();
-//            $blf->setPriceTo($price);
-//            $blf->setPriceFrom($price);
-//            $blf->setPage(1);
-//            $blist_form   = $this->createForm(BorrowListPostType::class, $blf, array(
-//                'action' => $this->generateUrl('borrowlist'),
-//                'method' => 'POST',));
-//
-//            $repository = $this->getDoctrine()->getRepository('AppBundle:MoheyOffer');
-//            $offers = $repository->findAllOffers($blf);            
-//        }
-//        else
-//        {
-//            //next page maybe
-//            $blf = new BorrowListForm();
-//            $blist_form   = $this->createForm(BorrowListPostType::class, $blf, array(
-//                'action' => $this->generateUrl('borrow'),
-//                'method' => 'POST',));
-//
-//            $blist_form->handleRequest($request);
-//
-//            if ($blist_form->isSubmitted() && $blist_form->isValid())
-//            {
-//                $page = $blist_form->getPage();
-//            }
-//            else
-//            {
-//                $blf = new BorrowListForm();
-//                $blf->setPriceTo(ConstantHelp::MaxPrice());
-//                $blf->setPriceFrom(0);
-//                $blf->setPage(1);
-//                $blist_form   = $this->createForm(BorrowListPostType::class, $blf, array(
-//                    'action' => $this->generateUrl('borrowlist'),
-//                    'method' => 'POST',));
-//
-//                $repository = $this->getDoctrine()->getRepository('AppBundle:MoheyOffer');
-//                $offers = $repository->findAllOffers($blf);                
-//            }
-//        }       
-        //return $this->render('mohey/borrowlist.html.twig', array('offers' => $offers, 'maxPages' => $maxPages, 'thisPage' => $page, 'borrowlist_form' => $blist_form->createView(), 'borrowlist' => $blf));
+        return $this->render('mohey/borrowlist.html.twig', array('borrowlistsearch' => $blf, 'borrowlist' => $offers, 'borrowlist_form' => $borrowlist_form->createView()));
     }
 }

@@ -12,20 +12,42 @@ use AppBundle\Common\ConstantHelp;
 
 class BorrowListSearchForm
 {
-    protected $page;
-    public $price;
+    public $minpage;
+    public $maxpage;
+    public $totalcount;
+    public $page;
+    protected $price;
     protected $proc;
     protected $date;
 
     public function __construct()
+    {        
+        $this->price = -1;
+        $this->proc = -1;
+        $this->date = -1;  
+        $this->totalcount = ConstantHelp::TotalBorrowCount();  
+        $this->setPage(1);        
+    }
+    
+    private function setMinMaxPage()
     {
-        $this->page = 1;
-        $this->price_from = 0;
-        $this->price_to = ConstantHelp::MaxPrice();
-        $this->proc_from = 0;
-        $this->proc_to = ConstantHelp::MaxProc();
-        $this->date_from = 0;
-        $this->date_to = ConstantHelp::MaxDate();        
+        if ($this->page > 3)
+        {
+            $this->minpage = $this->page - 2;
+        }
+        else
+        {
+            $this->minpage = 1;
+        }        
+        
+        if ($this->page + 2 < $this->totalcount)
+        {
+            $this->maxpage = $this->page + 2;
+        }
+        else
+        {
+            $this->maxpage = $this->totalcount;
+        }         
     }
     
     public function getPage()
@@ -35,8 +57,20 @@ class BorrowListSearchForm
 
     public function setPage($page)
     {
-        $this->page = $page;
+        $this->page = $page;   
+        $this->setMinMaxPage();
     }
+    
+    public function getTotalCount()
+    {
+        return $this->totalcount;
+    }
+
+    public function setTotalCount($totalcount)
+    {
+        $this->totalcount = $totalcount;
+        $this->setMinMaxPage();
+    }    
 
     public function getPrice()
     {

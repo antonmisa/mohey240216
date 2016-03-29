@@ -3,10 +3,94 @@
 {% block title %}The Mohey Project{% endblock %}
 {% block body %}
 
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-fixed-top topnav" role="navigation">
+        <div class="container topnav">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand topnav" href="{{ path("homepage")}}">Back main page</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>     
+    
     {{ form_start(borrow_form) }}
     {{ form_errors(borrow_form) }}
 
-    {{ form_row(borrow_form.save, { 'label': 'Get' }) }}
-    {{ form_end(borrow_form) }}
+    <div class="intro-header">
+        <br>
+        <hr class="intro-divider">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-2 col-lg-offset-4">
+                    <label for="inputPrice">User</label>
+                </div>    
+                <div class="col-lg-2">
+                    {{ form_widget(borrow_form.user, { 'attr': {'class': 'input-small form-control'}} ) }}
+                </div>   
+            </div>            
+            <div class="row">
+                <div class="col-lg-2 col-lg-offset-4">
+                    <label for="inputPrice">Price from</label>
+                </div>    
+                <div class="col-lg-2">
+                    {{ form_widget(borrow_form.price_from, { 'attr': {'class': 'input-small form-control'}} ) }}
+                </div>   
+            </div>  
+            <div class="row">
+                <div class="col-lg-2 col-lg-offset-4">
+                    <label for="inputPrice">Price to</label>
+                </div>    
+                <div class="col-lg-2">
+                    {{ form_widget(borrow_form.price_to, { 'attr': {'class': 'input-small form-control disabled'}} ) }}      
+                </div>                       
+            </div>   
+            <div class="row">
+                <div class="col-lg-2 col-lg-offset-4">
+                    <label for="inputPrice">Proc from</label>
+                </div>    
+                <div class="col-lg-2">
+                    {{ form_widget(borrow_form.proc_from, { 'attr': {'class': 'input-small form-control'}} ) }}
+                </div>   
+            </div> 
+            <div class="row">
+                <div class="col-lg-2 col-lg-offset-4">
+                    <label for="inputPrice">Proc to</label>
+                </div>    
+                <div class="col-lg-2">
+                    {{ form_widget(borrow_form.proc_to, { 'attr': {'class': 'input-small form-control disabled'}} ) }}
+                </div>   
+            </div>  
+            <div class="row">
+                <div class="col-lg-2 col-lg-offset-4">
+                    <label for="inputPrice">Date from</label>
+                </div>    
+                <div class="col-lg-2">
+                    {{ form_widget(borrow_form.date_from, { 'attr': {'class': 'input-small form-control'}} ) }}
+                </div>   
+            </div>    
+            <div class="row">
+                <div class="col-lg-2 col-lg-offset-4">
+                    <label for="inputPrice">Date to</label>
+                </div>    
+                <div class="col-lg-2">
+                    {{ form_widget(borrow_form.date_to, { 'attr': {'class': 'input-small form-control disabled'}} ) }}
+                </div>   
+            </div>      
+            <br>
+            <button class="btn btn-default" type="button" id="btnSearch">Search</button> 
+        </div>
+        <hr class="intro-divider">
+    </div>       
+        
+    {{ form_end(borrow_form) }}       
 
 {% endblock %}

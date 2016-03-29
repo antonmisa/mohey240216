@@ -30,7 +30,6 @@ class BorrowPostType extends AbstractType
             ->add('proc_to', NumberType::class, array('disabled' => true))
             ->add('date_from', NumberType::class, array('disabled' => true, 'scale' => 0))
             ->add('date_to', NumberType::class, array('disabled' => true, 'scale' => 0))
-            ->add('save', SubmitType::class)
         ;
     }
 

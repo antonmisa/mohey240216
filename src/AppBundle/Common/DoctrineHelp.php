@@ -26,7 +26,7 @@ class DoctrineHelp
 
         $paginator = new Paginator($query);
 
-        $totalItems = count($paginator);
+        $totalItems = 10;//count($paginator);
         
         $paginator
             ->getQuery()

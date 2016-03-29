@@ -26,19 +26,16 @@ class BorrowController extends Controller
         $repository = $this->getDoctrine()->getRepository('AppBundle:MoheyOffer');
         $offer = $repository->find($id);
 
-        $b_form = $this->createForm(BorrowPostType::class, $offer, array(
-            'action' => $this->generateUrl('borrow', array('id' => $id)),
-            'method' => 'POST',));
+        $borrow_form = $this->createForm(BorrowPostType::class, $offer);
+        $borrow_form->handleRequest($request);
 
-        $b_form->handleRequest($request);
-
-        if ($b_form->isSubmitted() && $b_form->isValid())
+        if ($borrow_form->isSubmitted() && $b_form->isValid())
         {
             return new Response('Here is the integration with payment!');
         }
         else
         {
-            return $this->render('mohey/borrow.html.twig', array('borrow_form' => $b_form->createView()));
+            return $this->render('mohey/borrow.html.twig', array('borrow_form' => $borrow_form->createView()));
         }
     }
 }

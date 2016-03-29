@@ -15,17 +15,54 @@ use AppBundle\Common\ConstantHelp;
 
 class MoheyOfferRepository extends EntityRepository
 {
-    public function findAllOffers(\AppBundle\Entity\BorrowListSearchForm $blf, &$totalItems, $columns = null, $order = null, $serialize = false)
+    public function findAllOffers(\AppBundle\Entity\BorrowListSearchForm $blf, $columns = null, $order = null, $serialize = false)
     {
+        $totalItems = 0;
         $pageSize = ConstantHelp::BorrowListLength();
         $price = $blf->getPrice();
+        $proc = $blf->getProc();
         $page = $blf->getPage();
+        $date = $blf->getDate();
+        
 
         $qb = $this->createQueryBuilder('p')
             ->select('p, p.offer_id, p.price_from, p.price_to, p.proc_from, p.proc_to, p.date_from, p.date_to, u.username')
             ->innerJoin('p.user', 'u')
-            ->where('NOT (p.price_from >= :price OR p.price_to <= :price) AND p.kind = 1 AND p.isActive = 1')
-            ->setParameter('price', $price);
+            ->where('(true = :allowprice AND NOT (p.price_from >= :price OR p.price_to <= :price) OR false = :allowprice) '
+                    . 'AND (true = :allowproc AND NOT (p.proc_from >= :proc OR p.proc_to <= :proc) OR false = :allowproc) '
+                    . 'AND (true = :allowdate AND NOT (p.date_from >= :date OR p.date_to <= :date) OR false = :allowdate) '
+                    . 'AND p.kind = 1 AND p.isActive = 1')
+            ->setParameter('price', $price)
+            ->setParameter('proc', $proc)
+            ->setParameter('date', $date);
+        
+        if ($price > 0)
+        {
+            $qb->setParameter('allowprice', true);
+        }
+        else
+        {
+            $qb->setParameter('allowprice', false);            
+        }
+        
+        if ($proc > 0)
+        {
+            $qb->setParameter('allowproc', true);
+        }
+        else
+        {
+            $qb->setParameter('allowproc', false);            
+        }    
+        
+        if ($date > 0)
+        {
+            $qb->setParameter('allowdate', true);
+        }
+        else
+        {
+            $qb->setParameter('allowdate', false);            
+        }          
+            
         if ($order != null && $columns != null && sizeOf($order) > 0)
         {
             //like [ 0 => [ column => 1, dir => asc ] ]
@@ -44,12 +81,13 @@ class MoheyOfferRepository extends EntityRepository
         }
         else
         {
-            $qb->orderBy("p.price_to" . "desc");
+            //$qb->orderBy("p.price_to" , "desc");
         }
         $query = $qb->getQuery();
 
+        $values = DoctrineHelp::paginate($query, $totalItems, $pageSize, $page);
+        $blf->setTotalCount($totalItems);        
         if ($serialize) {
-            $values = DoctrineHelp::paginate($query, $totalItems, $pageSize, $page);
             $return_values = array();
             foreach($values as $value) {
                 array_push($return_values, array("DT_RowId" => (string)$value['offer_id'], 
@@ -64,7 +102,7 @@ class MoheyOfferRepository extends EntityRepository
             return $return_values;
         }
         else {
-            return DoctrineHelp::paginate($query, $totalItems, $pageSize, $page);
+            return $values;
         }
     }
 }

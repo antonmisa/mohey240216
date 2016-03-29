@@ -10,22 +10,18 @@
         }
     </style>
     <script type="text/javascript" class="init">
-        $(document).ready(function() {                        
-            $('#example')   
-            .on('xhr.dt', function ( e, settings, json, xhr ) {
-                    var href_col = "{{ path('borrow', { id: "%_%" }) }}";                
-                    for ( var i=0, ien=json.data.length ; i < ien ; i++ ) { 
-                        json.data[i].href_col = "<a class=\"btn btn-default\" href=\"" + href_col.replace(escape("%_%"), json.data[i].DT_RowId) + "\">Borrow</a>";
-                    }
-                    // Note no return - manipulate the data directly in the JSON object.
-                } )            
+        $(document).ready(function() {   
+            var current_page = {{ borrowlistsearch.page }};  
             var dataTable = $('#example').dataTable( {
                      "searching": false,
+                     "ordering": false,
+                     "paging": false,
                      "info": false,
                      "lengthChange": false,
+                     "pagingType": "full",
                      "deferRender": true,
-                     "processing": true,
-                     "serverSide": true,
+                     "processing": false,
+                     "serverSide": false,
                      "columns": [
                          {
                              "class":          "details-control",
@@ -41,20 +37,21 @@
                          { "data": "proc_to" },
                          { "data": "date_from" },
                          { "data": "date_to" }
-                     ],                     
-                     "ajax": {
-                            "url" : "{{ path('requestborrowlist') }}",
-                            "data": function ( d ) {
-                                      d.price = $('#inputPrice').text();
-                                      d.proc = $('#inputProc').text();
-                                      d.date = $('#inputDate').text();
-                                  }                     
-                            }
-                      });                                              
+                     ]});                             
+               
+               $('#example_paginate').on( 'click', function (event) {
+                   var a_obj = $(event.target).closest('a');
+                   var dt_idx = a_obj.data("dt-idx");
+                   if ((current_page != dt_idx) && (!a_obj.hasClass("disabled"))) {
+                       $('#borrow_list_post_page').val(dt_idx);
+                       $('#borrowlist_form').submit();
+                   }
+               });
+               
+               $('#btnSearch').on( 'click', function (event) {
+                   $('#borrowlist_form').submit();
+               });
         } );          
-                    $('#btnSearch').click(function(){
-                dataTable.ajax.reload( null, false );
-            }); 
     </script>
 {% endblock %}
 {% block body %}
@@ -77,39 +74,40 @@
         </div>
         <!-- /.container -->
     </nav>            
+        
+    {{ form_start(borrowlist_form) }}
+    {{ form_errors(borrowlist_form) }}
     
     <div class="intro-header">
         <br>
         <div class="container">
             <div class="row">
-                <form class="form-horizontal">
+                <!--<form class="form-horizontal">-->
                      <div class="control-group">
                           <div class="controls form-inline">
                                <label for="inputPrice">I want to borrow</label>
-                               <input type="text" class="input-small form-control" placeholder="" id="inputPrice" value="{{ borrowlist.price }}">
+                               {% if borrowlistsearch.price > 0 %}
+                               {{ form_widget(borrowlist_form.price, { 'attr': {'class': 'input-small form-control', 'placeholder': 50}} ) }} 
+                               {% else %}
+                               {{ form_widget(borrowlist_form.price, { 'attr': {'class': 'input-small form-control', 'placeholder': 50, 'value': ""}} ) }} 
+                               {% endif %}
                                <label for="inputProc">USD, at</label>
-                               <input type="text" class="input-small form-control" placeholder="" id="inputProc">
+                               {% if borrowlistsearch.proc > 0 %}
+                               {{ form_widget(borrowlist_form.proc, { 'attr': {'class': 'input-small form-control', 'placeholder': 10}} ) }} 
+                               {% else %}
+                               {{ form_widget(borrowlist_form.proc, { 'attr': {'class': 'input-small form-control', 'placeholder': 10, 'value': ""}} ) }} 
+                               {% endif %}
                                <label for="inputDate">% per year, for </label>
-                               <input type="text" class="input-small form-control" placeholder="" id="inputDate">
+                               {% if borrowlistsearch.date > 0 %}                               
+                               {{ form_widget(borrowlist_form.date, { 'attr': {'class': 'input-small form-control', 'placeholder': 30}} ) }} 
+                               {% else %}
+                               {{ form_widget(borrowlist_form.date, { 'attr': {'class': 'input-small form-control', 'placeholder': 30, 'value': ""}} ) }}
+                               {% endif %}
                                <label for="inputValue">days.</label> 
-                               <button class="btn btn-default" type="button" id="btnSearch">Search</button> 
+                               <button class="btn btn-default" type="button" id="btnSearch">Search</button>                                
+                               {{ form_widget(borrowlist_form.page) }}
                           </div>
                      </div>
-                </form>
-                
-{#                <div class="col-lg-12">
-                    <div class="form-group">
-                        <div class="col-sm-3">I want to borrow <input type="text" id="price_search" name="price_search" class="form-control" placeholder="50"> USD</div>
-                        
-                        <div class="col-sm-3">
-                            at <input type="text" id="proc_search" name="proc_search" class="form-control"> % per year 
-                        </div>
-                        
-                        <div class="col-sm-3">
-                            for period about <input type="text" id="date_search" name="date_search" class="form-control"> days. <button class="btn btn-default" type="button">Search</button> 
-                        </div>
-                    </div>
-                </div> #}   
             </div>    
         </div>
     </div>    
@@ -143,59 +141,44 @@
                     <th>Days to</th>
                 </tr>
             </tfoot>
+            <tbody>
+                {% for lst_item in borrowlist %}
+                    <tr>
+                        <td><a class="btn btn-default" href="{{ path('borrow', { id: lst_item.offer_id }) }}">Borrow</a></td>  
+                        <td>{{ lst_item.username }}</td>
+                        <td>{{ lst_item.price_from }}</td>
+                        <td>{{ lst_item.price_to }}</td>
+                        <td>{{ lst_item.proc_from }}</td>
+                        <td>{{ lst_item.proc_to }}</td>
+                        <td>{{ lst_item.date_from }}</td>
+                        <td>{{ lst_item.date_to }}</td>                    
+                    </tr>    
+                {% endfor %}                                    
+            </tbody>            
         </table>
+        <div class="dataTables_paginate paging_simple_numbers" id="example_paginate">
+            {% if borrowlistsearch.page == 1 %}            
+                <a class="paginate_button previous disabled" aria-controls="example" data-dt-idx="{{ borrowlistsearch.page }}" tabindex="0" id="example_previous">Previous</a>
+            {% else %}
+                <a class="paginate_button previous" aria-controls="example" data-dt-idx="{{ borrowlistsearch.page - 1 }}" tabindex="0" id="example_previous">Previous</a>
+            {% endif %}    
+            <span>
+                {% for i in borrowlistsearch.minpage..borrowlistsearch.maxpage %}
+                    {% if i == borrowlistsearch.page %}
+                     <a class="paginate_button current" aria-controls="example" data-dt-idx="{{i}}" tabindex="0" href="javascript:;">{{i}}</a>
+                    {% else %}
+                     <a class="paginate_button" aria-controls="example" data-dt-idx="{{i}}" tabindex="0" href="javascript:;">{{i}}</a>
+                    {% endif %}
+                {% endfor %}
+            </span>
+            {% if borrowlistsearch.page == borrowlistsearch.totalcount %}
+                <a class="paginate_button next disabled" aria-controls="example" data-dt-idx="{{ borrowlistsearch.page }}" tabindex="0" id="example_next">Next</a>
+            {% else %}
+                <a class="paginate_button next" aria-controls="example" data-dt-idx="{{ borrowlistsearch.page + 1 }}" tabindex="0" id="example_next">Next</a>
+            {% endif %}    
+        </div>   
     </div>        
-{#
-    <h1>Current page is {{ thisPage }}</h1>
-
-    <table border="1">
-        <tr>
-            <td>&nbsp</td>
-            <td>user</td>
-            <td>sum from</td>
-            <td>sum to</td>
-            <td>proc from</td>
-            <td>proc to</td>
-            <td>days from</td>
-            <td>days to</td>
-        </tr>
-        {% for offer in offers %}
-            <tr>
-                <td><a href="{{ path('borrow', { id: offer.offer_id }) }}">...</a></td>
-                <td>{{ offer.username }}</td>
-                <td>{{ offer.price_from }}</td>
-                <td>{{ offer.price_to }}</td>
-                <td>{{ offer.proc_from }}</td>
-                <td>{{ offer.proc_to }}</td>
-                <td>{{ offer.date_from }}</td>
-                <td>{{ offer.date_to }}</td>
-            </tr>
-        {% endfor %}
-    </table>
-    {{ form_start(borrowlist_form) }}
-    {{ form_errors(borrowlist_form) }}
-
-    {% if maxPages > 1 %}
-        <ul class="pagination pagination-sm">
-            <li {{ thisPage == 1 ? 'class="disabled"' }}>
-                <a href="{{ path('borrowlist', {page: thisPage-1 < 1 ? 1 : thisPage-1}) }}">«</a>
-            </li>
-
-            {% for i in thisPage-2..thisPage+2 %}
-                {% if ((i < thisPage) and (i-1 > 0)) or ((i >= thisPage) and (i-1 < maxPages)) %}
-                    <li {{ thisPage == i ? 'class="active"' }}>
-                        <!--<a href="{{ path('borrowlist', {page: i}) }}">{{ i }}</a>-->
-                        <a href="javascript:;" onclick="parentNode.submit();">{{ i }}</a>
-                    </li>
-                {% endif %}
-            {% endfor %}
-
-            <li {{ thisPage == maxPages ? 'class="disabled"' }}>
-                <a href="{{ path('borrowlist', {page: thisPage+1 <= maxPages ? thisPage+1 : thisPage}) }}">»</a>
-            </li>
-        </ul>
-    {% endif %}
-
+    
     {{ form_end(borrowlist_form) }}
-#}
+
 {% endblock %}
