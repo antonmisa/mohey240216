@@ -98,10 +98,12 @@
 
                         <br>
 
-                        {% if app.user and is_granted("ROLE_OAUTH_USER") %}
-                            <p>Logged in as: {{app.user.user.username}}</p>
-                        {% else %}
                         <hr class="intro-divider">
+                        {% if (app.user and is_granted("ROLE_OAUTH_USER")) %}
+                        <ul class="list-inline intro-social-buttons">
+                            <a href="{{ path("userpanel") }}" class="btn btn-default btn-lg"><i class="fa fa-user"></i></a>
+                        </ul>
+                        {% else %}                        
                         <ul class="list-inline intro-social-buttons">
                             <li>
                                 <a href="{{ url("hwi_oauth_service_redirect", {service: "twitter"}) }}" class="btn btn-default btn-lg"><i class="fa fa-twitter fa-fw"></i> <span class="network-name">Twitter</span></a>

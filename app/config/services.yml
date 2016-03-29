@@ -7,6 +7,11 @@ services:
 #    service_name:
 #        class: AppBundle\Directory\ClassName
 #        arguments: ["@another_service_name", "plain_value", "%parameter_name%"]
+    app.form.type.task:
+        class: AppBundle\Form\BorrowPostType
+        arguments: ["@doctrine.orm.entity_manager"]
+        tags:
+            - { name: form.type }
     app.user_locale_listener:
         class: AppBundle\EventListener\UserLocaleListener
         arguments: ["@session"]
@@ -23,4 +28,4 @@ services:
         arguments: ["@doctrine", %admins%]
     logger_help:
         class: AppBundle\Common\LoggerHelp
-        arguments: ["@logger"]    
+        arguments: ["@logger"]                   

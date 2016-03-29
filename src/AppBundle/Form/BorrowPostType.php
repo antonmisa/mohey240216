@@ -9,21 +9,32 @@
 namespace AppBundle\Form;
 
 use Symfony\Component\Form\AbstractType;
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
+use AppBundle\Form\DataTransformer\MoheyUserToTextTransformer;
+
 class BorrowPostType extends AbstractType
 {
+    private $manager;
+
+    public function __construct(ObjectManager $manager)
+    {
+        $this->manager = $manager;
+    }    
+    
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add('offer_id', HiddenType::class)
-            ->add('user', EntityType::class, array('class' => 'AppBundle:MoheyUser', 'choice_label' => 'user_name', 'disabled' => true))
+            ->add('user', TextType::class, array('disabled' => true))
             ->add('price_from', NumberType::class, array('disabled' => true))
             ->add('price_to', NumberType::class, array('disabled' => true))
             ->add('proc_from', NumberType::class, array('disabled' => true))
@@ -31,6 +42,9 @@ class BorrowPostType extends AbstractType
             ->add('date_from', NumberType::class, array('disabled' => true, 'scale' => 0))
             ->add('date_to', NumberType::class, array('disabled' => true, 'scale' => 0))
         ;
+        
+        $builder->get('user')
+            ->addModelTransformer(new MoheyUserToTextTransformer($this->manager));
     }
 
     public function configureOptions(OptionsResolver $resolver)

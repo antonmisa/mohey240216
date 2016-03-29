@@ -65,7 +65,7 @@ class MoheyOffer
     public function __construct()
     {
         $this->isActive = true;
-    }
+    }    
     /**
      * Get offerId
      *

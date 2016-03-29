@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\User\AdvancedUserInterface;
  */
 class MoheyUser implements AdvancedUserInterface, \Serializable
 {
+    protected $uniqueName;
     /**
      * @ORM\Column(type="integer")
      * @ORM\Id
@@ -104,6 +105,11 @@ class MoheyUser implements AdvancedUserInterface, \Serializable
         $this->offers = new ArrayCollection();
         $this->isActive = true;
     }
+    
+    public function getUniqueName()
+    {
+        return "this is" + $this->username;
+    }    
     /**
      * @ORM\PrePersist
      */
